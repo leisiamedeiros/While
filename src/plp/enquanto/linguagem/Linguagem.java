@@ -46,11 +46,14 @@ public interface Linguagem {
 	class Se implements Comando {
 		private Bool condicao;
 		private Comando entao;
+		private Bool senaose;
+		private Comando entaosenao;
 		private Comando senao;
-
-		public Se(Bool condicao, Comando entao, Comando senao) {
+		public Se(Bool condicao, Comando entao, Bool senaose, Comando entaosenao, Comando senao) {
 			this.condicao = condicao;
 			this.entao = entao;
+			this.senaose = senaose;
+			this.entaosenao = entaosenao;
 			this.senao = senao;
 		}
 
@@ -58,6 +61,8 @@ public interface Linguagem {
 		public void execute() {
 			if (condicao.getValor())
 				entao.execute();
+			else if (senaose.getValor())
+				entaosenao.execute();
 			else
 				senao.execute();
 		}
@@ -99,7 +104,31 @@ public interface Linguagem {
 			}
 		}
 	}
-
+	
+	class Para implements Comando {
+		private String id;
+		private Expressao de;
+		private Expressao ate;
+		private Comando faca;
+		
+		public Para(String id, Expressao de, Expressao ate, Comando faca){
+			this.id = id;
+			this.de = de;
+			this.ate = ate;
+			this.faca = faca;
+		}
+		
+		//para id de expressao ate expressao faca comando
+		@Override
+		public void execute() {
+			for(int i = de.getValor(); i <= ate.getValor(); i++ ){
+				ambiente.put(id, new Integer(i));
+				faca.execute();
+			}
+		}
+		
+	}
+	
 	class Exiba implements Comando {
 		public Exiba(String texto) {
 			this.texto = texto;
@@ -216,7 +245,31 @@ public interface Linguagem {
 			return esq.getValor() * dir.getValor();
 		}
 	}
-
+	
+	class ExpDiv extends ExpBin{
+		public ExpDiv (Expressao esq, Expressao dir) {
+			super(esq, dir);
+		}
+		
+		@Override
+		public int getValor() {
+			return esq.getValor() / dir.getValor();
+		}
+		
+	}
+	
+	class ExpExpon extends ExpBin{
+		public ExpExpon(Expressao esq, Expressao dir) {
+			super(esq, dir);
+		}
+		
+		@Override
+		public int getValor() {
+			return (int)Math.pow(esq.getValor(), dir.getValor());
+		}
+		
+	}
+	
 	class Booleano implements Bool {
 		private boolean valor;
 
@@ -264,6 +317,29 @@ public interface Linguagem {
 		}
 	}
 
+	public class ExpMaiorIgual extends ExpRel {
+		public ExpMaiorIgual (Expressao esq, Expressao dir) {
+			super(esq, dir);
+		}
+		
+		@Override
+		public boolean getValor() {
+			return esq.getValor() >= dir.getValor();
+		}
+		
+	}
+	
+	public class ExpDiferente extends ExpRel {
+		public ExpDiferente(Expressao esq, Expressao dir) {
+			super(esq, dir);
+		}
+
+		@Override
+		public boolean getValor() {
+			return esq.getValor() != dir.getValor();
+		}
+	}
+	
 	public class NaoLogico implements Bool {
 		private Bool b;
 
@@ -291,4 +367,36 @@ public interface Linguagem {
 			return esq.getValor() && dir.getValor();
 		}
 	}
+
+	public class OuLogico implements Bool {
+		private Bool esq;
+		private Bool dir;
+		
+		public OuLogico(Bool esq, Bool dir) {
+			this.esq = esq;
+			this.dir = dir;
+		}
+		
+		@Override
+		public boolean getValor() {
+			return esq.getValor() || dir.getValor();
+		}		
+	}
+	
+	public class XorLogico implements Bool {
+		private Bool esq;
+		private Bool dir;
+		
+		public XorLogico(Bool esq, Bool dir) {
+			this.esq = esq;
+			this.dir = dir;
+		}
+		
+		@Override
+		public boolean getValor() {
+			return esq.getValor() ^ dir.getValor();
+		}
+		
+	}
+
 }

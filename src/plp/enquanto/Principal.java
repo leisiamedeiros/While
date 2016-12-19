@@ -25,22 +25,28 @@ public class Principal {
 
 	public static void main(String... args) throws IOException {
 		String programa = "x:=10; y:=leia ; c:= x + y; "
-				+ "se 30<=c entao escreva c senao exiba \"menor\"";
+				+ "se 30<=c entao escreva c senaose c = 15 entao exiba \"igual a 15\" senao exiba \"menor\"";
 		final ParseTree tree = parse(programa);
 		final ParseTreeWalker walker = new ParseTreeWalker();
 		final MeuListener listener = new MeuListener();
 		walker.walk(listener, tree);
+		
 		Programa p1 = listener.getPrograma();
 		// O parser devolve um objeto 'Programa' semelhante ao programa a seguir:
-		Programa p2 = new Programa(asList(
-				new Atribuicao("x", new Inteiro(10)),                       // x := 10
-				new Atribuicao("y", leia),                                  // y := leia
-				new Atribuicao("c", new ExpSoma(new Id("x"), new Id("y"))), // c := x + y
-				new Se(new ExpMenorIgual(new Inteiro(30), new Id("c")),     // se 30 <= c entao
-						new Escreva(new Id("c")),                           // escreva c
-						new Exiba("menor"))                                 // senao exiba "menor"
-				));
-		p1.execute();
-		p2.execute();
+		//p1.execute();
+		
+		String programa2 = "i:=0; "+"para i de 1 ate 5 faca escreva i";
+		final ParseTree tree2 = parse(programa2);
+		walker.walk(listener, tree2);
+		
+		Programa p2 = listener.getPrograma();
+		//p2.execute();
+		
+		String programa3 = "se verdadeiro xor verdadeiro entao exiba \"true\" senao exiba \"false\"";
+		final ParseTree tree3 = parse(programa3);
+		walker.walk(listener, tree3);
+		
+		Programa p3 = listener.getPrograma();
+		p3.execute();
 	}
 }
